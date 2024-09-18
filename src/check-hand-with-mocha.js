@@ -5,15 +5,27 @@ function isPair(hand){
 };
 
 function checkHand(hand) {
-	if(isPair(hand)){
+	if(isTwoPair(hand)){
+    return 'two pair';
+  }
+	else if(isPair(hand)){
 		return 'pair';
-	}else if(isTriple(hand)){
+	}else if(isFullHouse(hand)){
+    return 'full house';
+  }
+	else if(isTriple(hand)){
 		return 'three of a kind';
 	}else if(isQuadruple(hand)){
 		return 'four of a kind'
 	}
+	else if(isStraightFlush(hand)){
+    return 'straight flush';
+  }
 	else if(isFlush(hand)){
 		return 'flush'
+	}
+	else if(isStraight(hand)){
+		return 'straight'
 	}
 	else{
 		return 'high card'
@@ -35,6 +47,26 @@ function multiplesIn(hand){
 function isFlush(hand){
 	return allTheSameSuit(suitsFor(hand));
 }
+
+function isStraight(hand){
+	return cardsInSequence(valuesFromHand(hand))
+}
+function cardsInSequence(values){
+  var sortedValues = values.sort();
+  return fourAway(sortedValues) && noMultiples(values);
+};
+
+function fourAway(values){
+  return ((+values[values.length-1] - 4 - +values[0])===0);
+};
+
+function noMultiples(values){
+  return highestCount(values)==1;
+};
+function isStraightFlush(hand){
+  return isStraight(hand) && isFlush(hand);
+}
+
 
 function allTheSameSuit(suits){
 	let toReturn = true;
@@ -82,6 +114,58 @@ function valuesFromHand(hand){
 		return card.split('-')[0];
 	})
 }
+function allCounts(values){
+  var counts = {};
+  values.forEach(function(value, index){
+    counts[value]= 0;
+    if(value == values[0]){
+      counts[value] = counts[value] + 1;
+    };
+    if(value == values[1]){
+      counts[value] = counts[value] + 1;
+    };
+    if(value == values[2]){
+      counts[value] = counts[value] + 1;
+    };
+    if(value == values[3]){
+      counts[value] = counts[value] + 1;
+    };
+    if(value == values[4]){
+      counts[value] = counts[value] + 1;
+    };
+  });
+  var totalCounts = Object.keys(counts).map(function(key){
+    return counts[key];
+  });
+  return totalCounts.sort(function(a,b){return b-a});
+};
+function isFullHouse(hand){
+  var theCounts = allCounts(valuesFromHand(hand));
+  return(theCounts[0]===3 && theCounts[1]===2);
+};
+function isTwoPair(hand){
+  var theCounts = allCounts(valuesFromHand(hand));
+  return(theCounts[0]===2 && theCounts[1]===2);
+};
+
+
+describe('noMultiples()', () => {
+	it('reports true when all elements are different', ()=> {
+    var result = noMultiples(['2', '6']);
+    wish(result);
+  });
+  it('reports false when two elements are the same', ()=> {
+    var result = noMultiples(['2', '2']);
+    wish(!result);
+  });
+});
+
+describe('fourAway()', () => {
+	it('reports true if first and last are 4 away', ()=> {
+    var result = fourAway(['2', '6']);
+    wish(result);
+  });
+});
 
 describe('allTheSameSuit()', () => {
 	it('reports true if elements are the same', () => {
@@ -150,4 +234,21 @@ describe('checkHand()', () => {
 		var result = checkHand(['2-H', '5-H', '9-H', '7-H', '3-H']);
   	wish(result === 'flush');
 	});
+
+	it('handles straight', () => {
+		var result = checkHand(['1-H', '2-H', '3-H', '4-H', '5-D']);
+    wish(result === 'straight');
+	});
+	it('handles straight flush', ()=> {
+    var result = checkHand(['1-H', '2-H', '3-H', '4-H', '5-H']);
+    wish(result === 'straight flush');
+  });
+	it('handles full house', ()=> {
+    var result = checkHand(['2-D', '2-H', '3-H', '3-D', '3-C']);
+    wish(result === 'full house');
+  });
+	it('handles two pair', function() {
+    var result = checkHand(['2-D', '2-H', '3-H', '3-D', '8-D']);
+    wish(result === 'two pair');
+  });
  });
