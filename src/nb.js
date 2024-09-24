@@ -1,7 +1,7 @@
 fs = require('fs');
 // songs
 imagine = ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'];
-somewhere_over_the_rainbow = ['c', 'em', 'f', 'g', 'am'];
+somewhereOverTheRainbow = ['c', 'em', 'f', 'g', 'am'];
 tooManyCooks = ['c', 'g', 'f'];
 iWillFollowYouIntoTheDark = ['f', 'dm', 'bb', 'c', 'a', 'bbm'];
 babyOneMoreTime = ['cm', 'g', 'bb', 'eb', 'fm', 'ab'];
@@ -12,7 +12,7 @@ paperBag = ['bm7', 'e', 'c', 'g', 'b7', 'f', 'em', 'a', 'cmaj7',
 toxic = ['cm', 'eb', 'g', 'cdim', 'eb7', 'd7', 'db7', 'ab', 'gmaj7',
          'g7'];
 bulletproof = ['d#m', 'g#', 'b', 'f#', 'g#m', 'c#'];
-song_11 = [];
+blackSong = [];
 
 var songs = [];
 var labels = [];
@@ -25,9 +25,9 @@ var probabilityOfChordsInLabels = {};
 function train(chords, label){
   songs.push([label, chords]);
   labels.push(label);
-  for (var i = 0; i < chords.length; i++){
-    if(!allChords.includes(chords[i])){
-      allChords.push(chords[i]);
+  for (var index = 0; index < chords.length; index++){
+    if(!allChords.includes(chords[index])){
+      allChords.push(chords[index]);
     }
   }
   if(!!(Object.keys(labelCounts).includes(label))){
@@ -75,7 +75,7 @@ probabilityOfChordsInLabels[i][j] * 1.0 / songs.length;
 }
 
 train(imagine, 'easy');
-train(somewhere_over_the_rainbow, 'easy');
+train(somewhereOverTheRainbow, 'easy');
 train(tooManyCooks, 'easy');
 train(iWillFollowYouIntoTheDark, 'medium');
 train(babyOneMoreTime, 'medium');
