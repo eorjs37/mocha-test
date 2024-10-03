@@ -1,4 +1,3 @@
-fs = require('fs');
 // songs
 imagine = ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'];
 somewhereOverTheRainbow = ['c', 'em', 'f', 'g', 'am'];
@@ -28,7 +27,7 @@ function train(chords, label){
       allChords.push(chords[index]);
     }
   }
-  if(!!(Object.keys(labelCounts).includes(label))){
+  if((Object.keys(labelCounts).includes(label))){
     labelCounts[label] = labelCounts[label] + 1;
   } else {
     labelCounts[label] = 1;
