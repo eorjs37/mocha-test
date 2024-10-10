@@ -78,6 +78,8 @@ function classify(chords){
   const classified = new Map();
   classifier.labelProbabilities.forEach(function(_probabilities, difficulty){
     let first = classifier.labelProbabilities.get(difficulty) + smoothing;
+		console.log(classifier.probabilityOfChordsInLabels);
+
     chords.forEach(function(chord){
       const probabilityOfChordInLabel =
 classifier.probabilityOfChordsInLabels.get(difficulty)[chord];
