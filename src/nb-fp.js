@@ -14,25 +14,38 @@ const classifier = {
   labelCounts: new Map(),
   labelProbabilities: new Map(),
   chordCountsInLabels: new Map(),
-  probabilityOfChordsInLabels: new Map(),
-	smoothing:1.01,
-	classify:function(chords){
-		const classified = new Map();
-		this.labelProbabilities.forEach((_probabilities, difficulty)=>{
-			const totalLikehood = chords.reduce((total,chord) => {
-				const probabilityOfChordInLabel = this.probabilityOfChordsInLabels.get(difficulty)[chord];
-				if(probabilityOfChordInLabel){
-					return total * (probabilityOfChordInLabel + this.smoothing)
-				}else{
-					return total
-				}
-			}, this.labelProbabilities.get(difficulty) + this.smoothing)
+  smoothing: 1.01,
+  setProbabilityOfChordsInLabels: function(){
+    this.chordCountsInLabels.forEach(function(_chords, difficulty){
+      Object.keys(this.chordCountsInLabels.get(difficulty))
+        .forEach(function(chord){
+          this.chordCountsInLabels.get(difficulty)[chord]
+  /= this.songs.length;
+      }, this);
+    }, this);
+  },
+  likelihoodFromChord: function(difficulty, chord){
+    return this.chordCountsInLabels
+      .get(difficulty)[chord] / this.songs.length;
+  },
+  valueForChordDifficulty(difficulty, chord){
+    const value = this.likelihoodFromChord(difficulty, chord);
+    return value ? value + this.smoothing : 1;
+  },
+  classify: function(chords){
+    return new Map(Array.from(
+      this.labelProbabilities.entries()).map((labelWithProbability) => {
+      const difficulty = labelWithProbability[0];
+      return [difficulty, chords.reduce((total, chord) => {
+        return total * this.valueForChordDifficulty(difficulty, chord);
+        }, this.labelProbabilities.get(difficulty) + this.smoothing)];
+      }));
+}
 
-			classified.set(difficulty,totalLikehood)
-		});
-		return classified;
-	}
+
+
 };
+
 
 function train(chords, label){
   classifier.songs.push({label, chords});
@@ -66,16 +79,16 @@ function setChordCountsInLabels(){
   });
 }
 
-function setProbabilityOfChordsInLabels(){
-  classifier.probabilityOfChordsInLabels = classifier.chordCountsInLabels;
-  classifier.probabilityOfChordsInLabels.forEach(function(_chords, difficulty){
-    Object.keys(classifier.probabilityOfChordsInLabels.get(difficulty)).forEach(
-function(chord){
-      classifier.probabilityOfChordsInLabels.get(difficulty)[chord]
-/= classifier.songs.length;
-    });
-  });
-}
+// function setProbabilityOfChordsInLabels(){
+//   classifier.chordCountsInLabels.forEach(function(_chords, difficulty){
+//     Object.keys(classifier.chordCountsInLabels.get(difficulty))
+//       .forEach(function(chord){
+//         classifier.chordCountsInLabels.get(difficulty)[chord]
+// /= classifier.songs.length;
+//     });
+//   });
+// }
+
 
 function trainAll(){
   songList.songs.forEach(function(song){
@@ -87,8 +100,8 @@ function trainAll(){
 function setLabelsAndProbabilities(){
   setLabelProbabilities();
   setChordCountsInLabels();
-  setProbabilityOfChordsInLabels();
 };
+
 
 
 const wish = require('wish');
@@ -113,15 +126,19 @@ describe('the file', function() {
   songList.addSong('bulletproof',
 ['d#m', 'g#', 'b', 'f#', 'g#m', 'c#'], 2);
   trainAll();
+  console.log(classifier.probabilityOfChordsInLabels);
+  console.log(classifier.chordCountsInLabels);
+
   it('classifies', function(){
     const classified = classifier.classify(['f#m7', 'a', 'dadd9',
-                               'dmaj7', 'bm', 'bm7', 'd', 'f#m']);
+                                        'dmaj7', 'bm', 'bm7',
+                                        'd', 'f#m']);
     wish(classified.get('easy') === 1.3433333333333333);
     wish(classified.get('medium') === 1.5060259259259259);
     wish(classified.get('hard') === 1.6884223991769547);
   });
   it('classifies again', function(){
-    const classified =  classifier.classify(['d', 'g', 'e', 'dm']);
+    const classified = classifier.classify(['d', 'g', 'e', 'dm']);
     wish(classified.get('easy') === 2.023094827160494);
     wish(classified.get('medium') === 1.855758613168724);
     wish(classified.get('hard') === 1.855758613168724);
