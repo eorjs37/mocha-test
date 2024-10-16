@@ -1,4 +1,4 @@
-const classifier = {
+const classifierTemplate = {
   labelCounts: new Map(),
   labelProbabilities: new Map(),
   chordCountsInLabels: new Map(),
@@ -65,6 +65,7 @@ this.songList.songs.length);
 
 const wish = require('wish');
 describe('the file', () => {
+  const classifier = Object.create(classifierTemplate);
   classifier.songList.addSong('imagine',
 ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'], 0);
   classifier.songList.addSong('somewhereOverTheRainbow',
