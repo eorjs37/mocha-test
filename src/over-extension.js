@@ -1,39 +1,12 @@
-class Report {
+class GenericReport {
   constructor(params) {
     this.params = params;
   }
   printReport(params) {
-    return params;
+    return Object.assign(this.params, params);
   }
 }
-class GenericReport extends Report {
-  constructor(params) {
-    super(params);
-    this.params = params;
-  }
-  printReport(params) {
-    return super.printReport(Object.assign(this.params, params));
-  }
-}
-class ClientReport extends GenericReport {
-  constructor(params) {
-    super(params);
-    this.params = params;
-  }
-  printReport(params) {
-    return super.printReport(Object.assign(this.params, params));
-  }
-}
-class SpecificClientReport extends ClientReport {
-  constructor(params) {
-    super(params);
-    this.params = params;
-  }
-  printReport(params) {
-    return super.printReport(Object.assign(this.params, params));
-  }
-}
-const report = new SpecificClientReport({ whatever: "we want", to: "add" });
+const report = new GenericReport({ whatever: "we want", to: "add" });
 console.log(report.printReport({ extra: "params" }));
 
 const wish = require("wish");
