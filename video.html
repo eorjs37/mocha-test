@@ -1,41 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>VIDEO</title>
-	<link rel="stylesheet" href="./src/styles/reset.css">
-	<link rel="stylesheet" href="./src/styles/styles.css">
-</head>
-<body>
-	<video id="video" class="video" src="https://daegeon-everybody.s3.ap-northeast-2.amazonaws.com/video/video1.mp4"></video>
-	<div>
-		<button id="playbtn">재생</button>
-		<button id="pausebtn">중지</button>
-	</div>
-	<script src="./src/video.js"></script>
-	<script>
-		const ele = document.querySelector('#video')
-		const video = new Video(ele)
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VIDEO</title>
+    <link rel="stylesheet" href="./src/styles/reset.css" />
+    <link rel="stylesheet" href="./src/styles/styles.css" />
+  </head>
+  <body>
+    <video
+      id="video"
+      class="video"
+      src="https://daegeon-everybody.s3.ap-northeast-2.amazonaws.com/video/video1.mp4"
+    ></video>
+    <div>
+      <button id="playbtn">재생</button>
+      <button id="pausebtn">중지</button>
+      <button id="playControlBtn">재생/중지 버튼</button>
+    </div>
+    <script src="./src/video.js"></script>
+    <script>
+      const ele = document.querySelector("#video");
+      const video = new Video(ele);
 
-		const playbtn = document.querySelector('#playbtn')
-		const pausebtn  = document.querySelector('#pausebtn')
+      const playbtn = document.querySelector("#playbtn");
+      const pausebtn = document.querySelector("#pausebtn");
+      const playControlBtn = document.querySelector("#playControlBtn");
 
-		playbtn.addEventListener('click',()=>{
-			video.onPlay()
-			.then(()=>{
-				console.log("play success");
+      function State(state = new Stop()) {
+        this.state = state;
+        this.change = function (state) {
+          this.state = state;
+        };
+      }
+      function Play() {
+        this.play = () => {
+          console.log("재생 상태라 플레이 할 수 없음");
+        };
 
-			})
-			.catch(err=>{
-				console.error("err : ",err);
+        this.stop = (state, video) => {
+          video.onPause();
+          state.change(new Stop());
+        };
+      }
+      function Stop() {
+        this.play = (state, video) => {
+          video
+            .onPlay()
+            .then(() => {
+              console.log("play success");
+              state.change(new Play());
+            })
+            .catch((err) => {
+              console.error("err : ", err);
+            });
+        };
+        this.stop = () => {
+          console.log("중지 상태라 플레이 할 수 없음");
+        };
+      }
 
-			})
-		})
-		pausebtn.addEventListener('click',()=>{
-			video.onPause()
-		})
+      const state = new State();
 
-	</script>
-</body>
+      playbtn.addEventListener("click", () => {
+        video
+          .onPlay()
+          .then(() => {
+            console.log("play success");
+          })
+          .catch((err) => {
+            console.error("err : ", err);
+          });
+      });
+      pausebtn.addEventListener("click", () => {
+        video.onPause();
+      });
+
+      playControlBtn.addEventListener("click", () => {});
+    </script>
+  </body>
 </html>
