@@ -26,7 +26,7 @@ const brand = {
     return "don`t use";
   },
   changeStreaming() {
-    this.state.setState(streaming);
+    this.videoplayer.setState(streaming);
   },
 };
 
@@ -34,5 +34,8 @@ const videoState = new VideoPlay(streaming);
 console.log(videoState.state.play());
 console.log(videoState.state.pause());
 videoState.state.changeBrand();
+console.log(videoState.state.play());
+console.log(videoState.state.pause());
+videoState.state.changeStreaming();
 console.log(videoState.state.play());
 console.log(videoState.state.pause());
