@@ -11,6 +11,18 @@ class AnonymousPerson extends Person {
   }
 }
 
+class NullString {
+  capitalize() {
+    return this;
+  }
+  tigerify() {
+    return this;
+  }
+  display() {
+    return "";
+  }
+}
+
 class NameString extends String {
   capitalize() {
     return new NameString(this[0].toLocaleUpperCase() + this.substring(1));
@@ -23,6 +35,15 @@ class NameString extends String {
   }
 }
 
+function WithoutNull(person) {
+  personWithoutNull = Object.create(person);
+
+  if (personWithoutNull.name === null) {
+    personWithoutNull.name = new NullString();
+  }
+  return personWithoutNull;
+}
+
 const test = require("tape");
 
 test("Displaying a person", (assert) => {
@@ -30,6 +51,14 @@ test("Displaying a person", (assert) => {
   assert.equal(
     personOne.name.capitalize().tigerify().display(),
     "Tony, the tiger"
+  );
+  assert.end();
+});
+test("Displaying an anonymous person", (assert) => {
+  const personTwo = new AnonymousPerson("tony");
+  assert.equal(
+    WithoutNull(personTwo).name.capitalize().tigerify().display(),
+    ""
   );
   assert.end();
 });
